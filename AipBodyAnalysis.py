@@ -22,8 +22,23 @@ def get_file_content(Path):
 
 def get_Driver_status01(image):
 #     image = get_file_content(file_path)
-    result = client.driverBehavior(image);
-    return result
+    result = client.driverBehavior(image)
+
+    person_info = {
+    'person_num': result['person_num'],
+    'driver_num': result['driver_num'],
+    'attributes': result['person_info'][0]["attributes"],
+    'location': result['person_info'][0]['location'],
+    'both_hands_leaving_wheel': result['person_info'][0]["attributes"]['both_hands_leaving_wheel'],
+    'eyes_closed': result['person_info'][0]["attributes"]['eyes_closed'],
+    'no_face_mask': result['person_info'][0]["attributes"]['no_face_mask'],
+    'not_buckling_up': result['person_info'][0]["attributes"]['not_buckling_up'],
+    'smoke': result['person_info'][0]["attributes"]['smoke'],
+    'cellphone': result['person_info'][0]["attributes"]['cellphone'],
+    'yawning': result['person_info'][0]["attributes"]['not_facing_front'],
+    'head_lowered': result['person_info'][0]["attributes"]['head_lowered']
+    }
+    return person_info
 
 
 """识别指定行为类别，英文逗号分隔，默认所有属性都识别"""

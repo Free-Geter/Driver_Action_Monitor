@@ -1,5 +1,7 @@
 import base64
+from queue import Queue
 
+import test
 import PIL
 from PIL import Image, ImageDraw, ImageFont
 import numpy as np
@@ -11,7 +13,8 @@ from numpy import unicode
 
 import AipBodyAnalysis
 
-
+message_Queue = Queue()
+imdata_Queue = Queue()
 
 def info_getter(path):
     result = AipBodyAnalysis.get_Driver_status01(path)
@@ -102,49 +105,83 @@ if __name__ == '__main__':
     videoFile = 'MV.mp4'                # 待识别视频
     outputFile = 'C:/Users/DELL/Desktop/Slices'     # 识别结果存储地址
     timeF = 30                          # 视频帧计数间隔次数
-    color = (0, 255, 0)                 # 标注框颜色
-    fontsize = 20
-    fontcolor = (0, 255, 0)
+    # color = (0, 255, 0)                 # 标注框颜色
+    # fontsize = 20
+    # fontcolor = (0, 255, 0)
     if not os.path.exists(outputFile):
         os.makedirs(outputFile)
     vc = cv2.VideoCapture(videoFile)
+    width = 1200
+    height = 800
+    cv2.namedWindow("result", 0);
+    cv2.resizeWindow('result', int(width * (height - 80) / height), height - 80);
+    width = 1200
+    height = 800
+    cv2.namedWindow("frame", 0);
+    cv2.resizeWindow('frame', int(width * (height - 80) / height), height - 80);
     c = 1
     if vc.isOpened():
         rval, frame = vc.read()
+        rate = vc.get(5)  # 帧速率
+        FrameNumber = vc.get(7)  # 视频文件的帧数
+        duration = FrameNumber / rate   # 帧速率/视频总帧数 是时间，除以60之后单位是分钟
     else:
         print('openerror!')
         rval = False
-
-
+    d_thread = test.Action_Detect_Thread(imdata_Queue,message_Queue,duration)
+    d_thread.start()
+    target_count = 1
     while rval:
         rval, frame = vc.read()
+        # 展示未处理的图片
+        if rval:
+            cv2.imshow('frame', frame)
+
         if c % timeF == 0:
-            print('='*60)
-            person_info = info_getter(frame2base64(frame))
-            classed,warning = classifier(person_info)
-            result_disp(classed)
-            y = person_info['location']['top']
-            x = person_info['location']['left']
-            w = person_info['location']['width']
-            h = person_info['location']['height']
-            cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-
-            # 识别结果上添加警告文字
-            frame = change_cv2_draw(frame,warning,(x,y),fontsize,fontcolor)
-
-            # 输出标注后的图片
-            cv2.imwrite(outputFile + '/slice' + str(int(c / timeF)) + '.jpg', frame)
-
-            # 展示标注结果
-            # width = 1200
-            # height = 800
-            # cv2.namedWindow("frame", 0);
-            # cv2.resizeWindow('frame',int(width * (height - 80) / height), height - 80);
-            # cv2.imshow('frame', frame)
+            # print(int(c / timeF))
+            # print('='*60)
+            d_thread.get_imdata(frame)
+            # if not message_Queue.empty():
+            #     person_info = message_Queue.get()
+            #     if person_info == 'out_end':
+            #         print('out_end' * 10)
+            #         break
+            #     classed,warning = classifier(person_info)
+            #
+            #
+            #     # result_disp(classed)
+            #
+            #
+            #     y = person_info['location']['top']
+            #     x = person_info['location']['left']
+            #     w = person_info['location']['width']
+            #     h = person_info['location']['height']
+            #     cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+            #
+            #     # 识别结果上添加警告文字
+            #     frame = change_cv2_draw(frame,warning,(x,y),fontsize,fontcolor)
+            #
+            #     # 输出标注后的图片
+            #     cv2.imwrite(outputFile + '/slice' + str(target_count) + '.jpg', frame)
+            #     target_count += 1
+            #
+            #
+            #     # 展示标注结果
+            #
+            #     cv2.imshow('result', frame)
         if cv2.waitKey(40) & 0xFF == ord('q'):
             break
         c += 1
+    print('in_end'*10)
     vc.release()
+    cv2.destroyWindow('frame')
+    while True:
+        if not message_Queue.empty():
+            if message_Queue.get() == 'out_end':
+                cv2.destroyWindow('result')
+                d_thread.terminal()
+
+
 
 
 
