@@ -16,33 +16,10 @@ import AipBodyAnalysis
 message_Queue = Queue()
 imdata_Queue = Queue()
 
-def info_getter(path):
-    result = AipBodyAnalysis.get_Driver_status01(path)
-    print('t_result', type(result))
-    print(result)
 
-    person_info = {
-        'person_num': result['person_num'],
-        'driver_num': result['driver_num'],
-        'attributes': result['person_info'][0]["attributes"],
-        'location': result['person_info'][0]['location'],
-        'both_hands_leaving_wheel': result['person_info'][0]["attributes"]['both_hands_leaving_wheel'],
-        'eyes_closed': result['person_info'][0]["attributes"]['eyes_closed'],
-        'no_face_mask': result['person_info'][0]["attributes"]['no_face_mask'],
-        'not_buckling_up': result['person_info'][0]["attributes"]['not_buckling_up'],
-        'smoke': result['person_info'][0]["attributes"]['smoke'],
-        'cellphone': result['person_info'][0]["attributes"]['cellphone'],
-        'yawning': result['person_info'][0]["attributes"]['not_facing_front'],
-        'head_lowered': result['person_info'][0]["attributes"]['head_lowered']
-    }
-
-    # for k, v in person_info.items():
-    #     print(type(v))
-    #     print(k, v)
-
-    return person_info
-
-
+'''
+处理Person_info,返回结果字典、warning字符串
+'''
 def classifier(info):
     warn_dict = {
         'both_hands_leaving_wheel':'双手离开键盘',
@@ -81,6 +58,9 @@ def result_disp(info):
         print(type(v))
         print(k,v)
 
+'''
+图像的base64编码
+'''
 def frame2base64(frame):
     img = Image.fromarray(frame)  # 将每一帧转为Image
     output_buffer = BytesIO()  # 创建一个BytesIO
@@ -89,7 +69,9 @@ def frame2base64(frame):
     base64_data = base64.b64encode(byte_data)  # 转为BASE64
     return base64_data  # 转码成功 返回base64编码
 
-
+'''
+给opencv图像添加文字
+'''
 def change_cv2_draw(image,strs,local,sizes,colour):
     cv2img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     pilimg = Image.fromarray(cv2img)
@@ -99,6 +81,13 @@ def change_cv2_draw(image,strs,local,sizes,colour):
     draw.text(local, strs, font=font,fill=colour)
     image = cv2.cvtColor(np.array(pilimg), cv2.COLOR_RGB2BGR)
     return image
+
+
+'''
+处理并输出图像
+'''
+# def detect(frame,outputfile):
+
 
 
 if __name__ == '__main__':
@@ -115,8 +104,6 @@ if __name__ == '__main__':
     height = 800
     cv2.namedWindow("result", 0);
     cv2.resizeWindow('result', int(width * (height - 80) / height), height - 80);
-    width = 1200
-    height = 800
     cv2.namedWindow("frame", 0);
     cv2.resizeWindow('frame', int(width * (height - 80) / height), height - 80);
     c = 1

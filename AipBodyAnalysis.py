@@ -23,7 +23,6 @@ def get_file_content(Path):
 def get_Driver_status01(image):
 #     image = get_file_content(file_path)
     result = client.driverBehavior(image)
-
     person_info = {
     'person_num': result['person_num'],
     'driver_num': result['driver_num'],

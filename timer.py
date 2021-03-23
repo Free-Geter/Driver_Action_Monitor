@@ -29,7 +29,7 @@ if __name__ == '__main__':
         rval, frame = vc.read()
         if c % timeF == 0:
             print('='*60)
-            person_info = info_getter(frame2base64(frame))
+            person_info = AipBodyAnalysis.get_Driver_status01(frame2base64(frame))
             classed,warning = classifier(person_info)
             result_disp(classed)
             y = person_info['location']['top']
