@@ -1,3 +1,6 @@
+from keras_preprocessing.image import ImageDataGenerator
+
+
 def CNN():
     import numpy as np
     np.random.seed(1337)
@@ -20,6 +23,10 @@ def CNN():
     X_test = X_test.reshape(-1, 1, 28, 28)
     Y_train = np_utils.to_categorical(Y_train, num_classes=10)
     Y_test = np_utils.to_categorical(Y_test, num_classes=10)
+
+    datagen = ImageDataGenerator()
+    datagen.fit(X_train)
+    # X_batch, Y_batch = datagen.flow(X_train, Y_train, batch_size=32)
 
     # model design
     model = Sequential()
@@ -75,7 +82,10 @@ def CNN():
 
     # Training
     print("Training...")
-    model.fit(X_train,Y_train,epochs=1,batch_size=32)
+    model.fit_generator(datagen.flow(X_train, Y_train, batch_size=32),
+                        steps_per_epoch=len(X_train) / 32,
+                        epochs=1)
+    # model.fit(X_train,Y_train,epochs=1,batch_size=32)
 
     # Testing
     print("Testing...")
@@ -83,3 +93,6 @@ def CNN():
 
     print('test loss',loss)
     print('test accuracy',accuracy)
+
+if __name__ == '__main__':
+    CNN()
