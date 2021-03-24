@@ -11,7 +11,7 @@ from multiprocessing import cpu_count
 import cv2
 
 # 导入image_augmentation.py为一个可调用模块
-import augmentation as ia
+from model.data_augmentation import augmentation as ia
 
 
 # 利用Python的argparse模块读取输入输出和各种扰动参数

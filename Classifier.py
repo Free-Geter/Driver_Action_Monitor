@@ -1,4 +1,5 @@
 import base64
+import datetime
 from queue import Queue
 
 import test
@@ -54,11 +55,12 @@ def classifier(info):
         warning += (warn_dict['Fatigue_driving'] + '\n')
     else:
         classify_result['Fatigue_driving'] = {'re': False, 'rate': 0}
+
+
     return (classify_result,warning)
 
 def result_disp(info):
     for k,v in info.items():
-        print(type(v))
         print(k,v)
 
 '''
@@ -149,9 +151,6 @@ def detect(videoFile,outputFile):
 if __name__ == '__main__':
     videoFile = 'MV2.mp4'                # 待识别视频
     outputFile = 'C:/Users/DELL/Desktop/Slices'     # 识别结果存储地址
-    # if not os.path.exists(outputFile):
-    #     os.makedirs(outputFile)
-    # vc = cv2.VideoCapture(videoFile)
     width = 1200
     height = 800
 
@@ -159,49 +158,6 @@ if __name__ == '__main__':
     windows_creater('result',800,400)
 
     detect(videoFile,outputFile)
-
-    # c = 1
-    # if vc.isOpened():
-    #     rval, frame = vc.read()
-    #     rate = vc.get(5)  # 帧速率
-    #     FrameNumber = vc.get(7)  # 视频文件的帧数
-    #     duration = FrameNumber / rate   # 帧速率/视频总帧数 是时间，除以60之后单位是分钟
-    # else:
-    #     print('openerror!')
-    #     rval = False
-    # d_thread = test.Action_Detect_Thread(imdata_Queue,message_Queue,duration)
-    # d_thread.start()
-    # target_count = 1
-    # while rval:
-    #     rval, frame = vc.read()
-    #     # 展示未处理的图片
-    #     if rval:
-    #         cv2.imshow('frame', frame)
-    #
-    #     if c % rate == 0:
-    #         # print(int(c / timeF))
-    #         # print('='*60)
-    #         d_thread.get_imdata(frame)
-    #
-    #     if cv2.waitKey(40) & 0xFF == ord('q'):
-    #         break
-    #     c += 1
-    # print('in_end'*10)
-    # d_thread.get_imdata('in_end')
-    # vc.release()
-    # cv2.destroyWindow('frame')
-    # while True:
-    #     if not message_Queue.empty():
-    #         mess = message_Queue.get()
-    #         if mess == 'out_end':
-    #             cv2.destroyWindow('result')
-    #             d_thread.terminal()
-    #             break
-    #         else:
-    #             cv2.imshow('result',mess)
-
-
-
 
 
 

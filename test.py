@@ -1,8 +1,8 @@
 import threading
 import AipBodyAnalysis
+import datetime
 from Classifier import *
-
-
+import DB_driver
 
 
 class Action_Detect_Thread(threading.Thread):
@@ -60,8 +60,20 @@ class Action_Detect_Thread(threading.Thread):
 
         # 输出标注后的图片
         cv2.imwrite(outputFile + '/slice_' + str(self.target_count) + '.jpg', frame)
+
+        for a in classed.keys():
+            if classed[a]['re']:
+                data_set = {
+                    'date': datetime.date.today(),
+                    'begin_time': str(int(self.target_count / 60)).zfill(2) + ':' + str(self.target_count % 60).zfill(2),
+                    'behavior_type':a,
+                    'behavior_possibility': classed[a]['rate'],
+                    'photo':outputFile + '/slice_' + str(self.target_count) + '.jpg'
+                }
+                DB_driver.insert(data_set['date'],data_set['begin_time'],data_set['behavior_type'],data_set['behavior_possibility'],
+                                 data_set['photo'])
         self.target_count += 1
-        # 展示标注结果
+
         if self.ok:
             print(self.target_count)
             cv2.imshow('result', frame)
