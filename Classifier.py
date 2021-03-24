@@ -22,12 +22,15 @@ imdata_Queue = Queue()
 '''
 def classifier(info):
     warn_dict = {
-        'both_hands_leaving_wheel':'双手离开键盘',
+        'both_hands_leaving_wheel':'双手离开方向盘',
         'no_face_mask': '未佩戴口罩',
         'not_buckling_up': '未佩戴安全带',
         'smoke': '吸烟',
         'cellphone': '使用手机',
-        'Fatigue_driving': '疲劳驾驶'
+        'Fatigue_driving': '疲劳驾驶',
+        'yawning':'打哈欠',
+        'eyes_closed':'闭眼',
+        'head_lowered':'低头'
     }
     classify_result = {}
     warning = "需要警告的项目：\n"
@@ -83,90 +86,119 @@ def change_cv2_draw(image,strs,local,sizes,colour):
     return image
 
 
+
+'''
+创建展示窗口
+'''
+def windows_creater(name, width, height):
+    cv2.namedWindow(name, 0);
+    cv2.resizeWindow(name, int(width * (height - 80) / height), height - 80);
+
+
+
 '''
 处理并输出图像
 '''
-# def detect(frame,outputfile):
-
-
-
-if __name__ == '__main__':
-    videoFile = 'MV.mp4'                # 待识别视频
-    outputFile = 'C:/Users/DELL/Desktop/Slices'     # 识别结果存储地址
-    timeF = 30                          # 视频帧计数间隔次数
-    # color = (0, 255, 0)                 # 标注框颜色
-    # fontsize = 20
-    # fontcolor = (0, 255, 0)
+def detect(videoFile,outputFile):
+    color = (0, 255, 0)  # 标注框颜色
+    fontsize = 20
+    fontcolor = (0, 255, 0)
+    outputFile = 'C:/Users/DELL/Desktop/Slices'  # 识别结果存储地址
     if not os.path.exists(outputFile):
         os.makedirs(outputFile)
     vc = cv2.VideoCapture(videoFile)
-    width = 1200
-    height = 800
-    cv2.namedWindow("result", 0);
-    cv2.resizeWindow('result', int(width * (height - 80) / height), height - 80);
-    cv2.namedWindow("frame", 0);
-    cv2.resizeWindow('frame', int(width * (height - 80) / height), height - 80);
-    c = 1
     if vc.isOpened():
         rval, frame = vc.read()
         rate = vc.get(5)  # 帧速率
-        FrameNumber = vc.get(7)  # 视频文件的帧数
-        duration = FrameNumber / rate   # 帧速率/视频总帧数 是时间，除以60之后单位是分钟
+        # FrameNumber = vc.get(7)  # 视频文件的帧数
+        # duration = FrameNumber / rate  # 帧速率/视频总帧数 是时间，除以60之后单位是分钟
+        d_thread = test.Action_Detect_Thread(imdata_Queue, message_Queue,fontsize,fontcolor,outputFile)
+        d_thread.start()
+        # 视频播放计数器
+        c = 1
     else:
         print('openerror!')
         rval = False
-    d_thread = test.Action_Detect_Thread(imdata_Queue,message_Queue,duration)
-    d_thread.start()
-    target_count = 1
     while rval:
         rval, frame = vc.read()
-        # 展示未处理的图片
         if rval:
             cv2.imshow('frame', frame)
-
-        if c % timeF == 0:
-            # print(int(c / timeF))
-            # print('='*60)
+        if c % int(rate) == 0:
             d_thread.get_imdata(frame)
-            # if not message_Queue.empty():
-            #     person_info = message_Queue.get()
-            #     if person_info == 'out_end':
-            #         print('out_end' * 10)
-            #         break
-            #     classed,warning = classifier(person_info)
-            #
-            #
-            #     # result_disp(classed)
-            #
-            #
-            #     y = person_info['location']['top']
-            #     x = person_info['location']['left']
-            #     w = person_info['location']['width']
-            #     h = person_info['location']['height']
-            #     cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-            #
-            #     # 识别结果上添加警告文字
-            #     frame = change_cv2_draw(frame,warning,(x,y),fontsize,fontcolor)
-            #
-            #     # 输出标注后的图片
-            #     cv2.imwrite(outputFile + '/slice' + str(target_count) + '.jpg', frame)
-            #     target_count += 1
-            #
-            #
-            #     # 展示标注结果
-            #
-            #     cv2.imshow('result', frame)
-        if cv2.waitKey(40) & 0xFF == ord('q'):
+        if cv2.waitKey(int(rate)) & 0xFF == ord('q'):
             break
         c += 1
     print('in_end'*10)
+    d_thread.get_imdata('in_end')
     vc.release()
     cv2.destroyWindow('frame')
     while True:
         if not message_Queue.empty():
-            if message_Queue.get() == 'out_end':
-                cv2.destroyWindow('result')
-                d_thread.terminal()
+            mess = message_Queue.get()
+            if mess == 'out_end':
+                break
+            else:
+                cv2.imshow('result',mess)
+        else:
+            break
+    cv2.destroyWindow('result')
+    d_thread.terminal()
+
+
+
+if __name__ == '__main__':
+    videoFile = 'MV2.mp4'                # 待识别视频
+    outputFile = 'C:/Users/DELL/Desktop/Slices'     # 识别结果存储地址
+    # if not os.path.exists(outputFile):
+    #     os.makedirs(outputFile)
+    # vc = cv2.VideoCapture(videoFile)
+    width = 1200
+    height = 800
+
+    windows_creater('frame',800,400)
+    windows_creater('result',800,400)
+
+    detect(videoFile,outputFile)
+
+    # c = 1
+    # if vc.isOpened():
+    #     rval, frame = vc.read()
+    #     rate = vc.get(5)  # 帧速率
+    #     FrameNumber = vc.get(7)  # 视频文件的帧数
+    #     duration = FrameNumber / rate   # 帧速率/视频总帧数 是时间，除以60之后单位是分钟
+    # else:
+    #     print('openerror!')
+    #     rval = False
+    # d_thread = test.Action_Detect_Thread(imdata_Queue,message_Queue,duration)
+    # d_thread.start()
+    # target_count = 1
+    # while rval:
+    #     rval, frame = vc.read()
+    #     # 展示未处理的图片
+    #     if rval:
+    #         cv2.imshow('frame', frame)
+    #
+    #     if c % rate == 0:
+    #         # print(int(c / timeF))
+    #         # print('='*60)
+    #         d_thread.get_imdata(frame)
+    #
+    #     if cv2.waitKey(40) & 0xFF == ord('q'):
+    #         break
+    #     c += 1
+    # print('in_end'*10)
+    # d_thread.get_imdata('in_end')
+    # vc.release()
+    # cv2.destroyWindow('frame')
+    # while True:
+    #     if not message_Queue.empty():
+    #         mess = message_Queue.get()
+    #         if mess == 'out_end':
+    #             cv2.destroyWindow('result')
+    #             d_thread.terminal()
+    #             break
+    #         else:
+    #             cv2.imshow('result',mess)
 
 
 

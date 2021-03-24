@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import numpy as np
 import seaborn as sns
+from keras_preprocessing.image import ImageDataGenerator
 from sklearn.datasets import load_files
 from keras.utils import np_utils
 import matplotlib.pyplot as plt
@@ -169,7 +170,23 @@ filepath = os.path.join(MODEL_PATH,"distracted-{epoch:02d}-{val_accuracy:.2f}.hd
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max',period=1)
 callbacks_list = [checkpoint]
 
-model_history = model.fit(train_tensors,ytrain,validation_data = (valid_tensors, ytest),epochs=25, batch_size=40, shuffle=True,callbacks=callbacks_list)
+shift_w = 0.4     # 位移强度
+shift_h = 0.2
+shear_range = 1.25   # 推移错切的强度
+rotation_range = 25     # 旋转角度
+datagen = ImageDataGenerator(width_shift_range=shift_w, height_shift_range=shift_h,
+                             shear_range=shear_range,
+                             rotation_range=rotation_range,
+                             horizontal_flip=True,
+                             fill_mode='constant')
+datagen.fit(train_tensors)
+model_history = model.fit_generator(datagen.flow(train_tensors,ytrain,batch_size=40),
+                        steps_per_epoch=len(train_tensors) / 40,
+                        epochs = 25,
+                        callbacks=callbacks_list,
+                        shuffle=True,
+                        validation_data = (valid_tensors, ytest))
+# model_history = model.fit(train_tensors,ytrain,validation_data = (valid_tensors, ytest),epochs=25, batch_size=40, shuffle=True,callbacks=callbacks_list)
 fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 12))
 ax1.plot(model_history.history['loss'], color='b', label="Training loss")
 ax1.plot(model_history.history['val_loss'], color='r', label="validation loss")

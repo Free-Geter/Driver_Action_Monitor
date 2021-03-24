@@ -8,7 +8,7 @@ import time
 classifier = cv2.CascadeClassifier(
     "D:/software/anaconda3/Lib/site-packages/cv2/data/haarcascade_frontalface_default.xml")
 sys.path.append('../../api')
-model = load_model('F:/workspace/Driver_Action_Monitor/model/model/self_trained/distracted-20-1.00.hdf5')
+model = load_model('/model/model/self_trained/Overfitting-20-1.00.hdf5')
 
 def get_image(cap, image_queue):
     c = 0

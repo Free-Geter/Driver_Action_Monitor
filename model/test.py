@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import Classifier
 
-model = load_model('F:/workspace/Driver_Action_Monitor/model/model/self_trained/distracted-20-1.00.hdf5')
+model = load_model('F:\workspace\Driver_Action_Monitor\model\model\self_trained\distracted-17-0.92.hdf5')
 def path_to_tensor(img_path):
     # loads RGB image as PIL.Image.Image type
     img = image.load_img(img_path, target_size=(64, 64))
@@ -44,13 +44,19 @@ def video_to_tensor(video_path):
                 'normal driving': result[9]
             }
             warning = max(action_dict, key=action_dict.get)
-            cv2.putText(frame, warning, (100, 300), cv2.FONT_HERSHEY_SIMPLEX,
-                        3, (255, 255, 255), 3, cv2.LINE_AA)
+            if warning != 'reaching behind':
+                print('=' * 30)
+                print(warning)
+                cv2.putText(frame, warning, (100, 300), cv2.FONT_HERSHEY_SIMPLEX,
+                            3, (255, 255, 255), 3, cv2.LINE_AA)
+            # else:
+            #     print('bad...')
+
             #re_frame = Classifier.change_cv2_draw(frame, warning, (100,100), 20, (0, 255, 0))
             cv2.imshow('result',frame)
             cv2.waitKey(1)
-            print('='*30)
-            print(warning)
+
+
         else:
             break
             # cv2.imshow("frame", frame)  # 正常显示frame
@@ -72,12 +78,16 @@ def detect_test(img_path):
         'talking on the phone - right': result[8],
         'normal driving': result[9]
     }
-    print(max(action_dict,key=action_dict.get))
+    warning = max(action_dict,key=action_dict.get)
+    if warning != 'reaching behind':
+        print(warning)
+    else:
+        print('bad...')
 
 
 if __name__ == '__main__':
     video_to_tensor('../MV.mp4')
-    # detect_test('F:/workspace/Driver_Action_Monitor/model/input/state-farm-distracted-driver-detection/imgs/train/c9/img_19.jpg')
+    # detect_test('F:/workspace/Driver_Action_Monitor/model/input/state-farm-distracted-driver-detection/imgs/train/c0/img_327.jpg')
 
 
 # laber_dict = {'c3': 'texting - left',
