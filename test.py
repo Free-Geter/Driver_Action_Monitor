@@ -53,7 +53,7 @@ class Action_Detect_Thread(threading.Thread):
         x = person_info['location']['left']
         w = person_info['location']['width']
         h = person_info['location']['height']
-        cv2.rectangle(frame, (x, y), (x + w, y + h), fontcolor, 2)
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0) , 2)
 
         # 识别结果上添加警告文字
         frame = change_cv2_draw(frame, warning, (x, y), fontsize, fontcolor)
@@ -64,7 +64,7 @@ class Action_Detect_Thread(threading.Thread):
         for a in classed.keys():
             if classed[a]['re']:
                 data_set = {
-                    'date': datetime.date.today(),
+                    'date': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
                     'begin_time': str(int(self.target_count / 60)).zfill(2) + ':' + str(self.target_count % 60).zfill(2),
                     'behavior_type':a,
                     'behavior_possibility': classed[a]['rate'],

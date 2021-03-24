@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import Classifier
 
-model = load_model('F:\workspace\Driver_Action_Monitor\model\model\self_trained\distracted-17-0.92.hdf5')
+model = load_model('model/self_trained/Overfitting-20-1.00.hdf5')
 def path_to_tensor(img_path):
     # loads RGB image as PIL.Image.Image type
     img = image.load_img(img_path, target_size=(64, 64))
@@ -17,12 +17,14 @@ def path_to_tensor(img_path):
 def video_to_tensor(video_path):
     cap = cv2.VideoCapture(video_path)
     ret, frame = cap.read()
+    rate = cap.get(5)  # 帧速率
     width = 1200
     height = 800
     cv2.namedWindow("result", 0);
     cv2.resizeWindow('result', int(width * (height - 80) / height), height - 80);
     while True:
         ret, frame = cap.read()
+
         if ret == True:
             img = Image.fromarray(frame)  # 完成np.array向PIL.Image格式的转换
             # print('img type',type(img))
@@ -44,17 +46,18 @@ def video_to_tensor(video_path):
                 'normal driving': result[9]
             }
             warning = max(action_dict, key=action_dict.get)
-            if warning != 'reaching behind':
-                print('=' * 30)
-                print(warning)
-                cv2.putText(frame, warning, (100, 300), cv2.FONT_HERSHEY_SIMPLEX,
-                            3, (255, 255, 255), 3, cv2.LINE_AA)
+            # if warning != 'reaching behind':
+            #     print('=' * 30)
+            #     print(warning)
+            cv2.putText(frame, warning, (100, 300), cv2.FONT_HERSHEY_SIMPLEX,
+                        3, (255, 255, 255), 3, cv2.LINE_AA)
             # else:
             #     print('bad...')
 
             #re_frame = Classifier.change_cv2_draw(frame, warning, (100,100), 20, (0, 255, 0))
             cv2.imshow('result',frame)
-            cv2.waitKey(1)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
 
         else:
@@ -86,7 +89,7 @@ def detect_test(img_path):
 
 
 if __name__ == '__main__':
-    video_to_tensor('../MV.mp4')
+    video_to_tensor('../MV2.mp4')
     # detect_test('F:/workspace/Driver_Action_Monitor/model/input/state-farm-distracted-driver-detection/imgs/train/c0/img_327.jpg')
 
 

@@ -27,7 +27,6 @@ def insert(date,begin_time,behavior_type,behavior_possibility,photo):
     sql = """INSERT INTO driving_behavior_record
     (date, begin_time, behavior_type, behavior_possibility, photo)
     VALUES ('{0}', '{1}', '{2}', {3}, '{4}');""".format(date,begin_time,behavior_type,behavior_possibility,photo)
-    print()
     try:
         cursor.execute(sql)
         db.commit()

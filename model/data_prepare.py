@@ -170,17 +170,17 @@ filepath = os.path.join(MODEL_PATH,"distracted-{epoch:02d}-{val_accuracy:.2f}.hd
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max',period=1)
 callbacks_list = [checkpoint]
 
-shift_w = 0.4     # 位移强度
+shift_w = 0.3     # 位移强度
 shift_h = 0.2
 shear_range = 1.25   # 推移错切的强度
 rotation_range = 25     # 旋转角度
 datagen = ImageDataGenerator(width_shift_range=shift_w, height_shift_range=shift_h,
-                             shear_range=shear_range,
-                             rotation_range=rotation_range,
-                             horizontal_flip=True,
-                             fill_mode='constant')
+
+                             horizontal_flip=True,)
+                             # fill_mode='constant'shear_range=shear_range,
+#                              rotation_range=rotation_range,)
 datagen.fit(train_tensors)
-model_history = model.fit_generator(datagen.flow(train_tensors,ytrain,batch_size=40),
+model_history = model.fit(datagen.flow(train_tensors,ytrain,batch_size=40),
                         steps_per_epoch=len(train_tensors) / 40,
                         epochs = 25,
                         callbacks=callbacks_list,

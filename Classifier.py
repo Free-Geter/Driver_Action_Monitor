@@ -55,8 +55,6 @@ def classifier(info):
         warning += (warn_dict['Fatigue_driving'] + '\n')
     else:
         classify_result['Fatigue_driving'] = {'re': False, 'rate': 0}
-
-
     return (classify_result,warning)
 
 def result_disp(info):
@@ -103,7 +101,7 @@ def windows_creater(name, width, height):
 '''
 def detect(videoFile,outputFile):
     color = (0, 255, 0)  # 标注框颜色
-    fontsize = 20
+    fontsize = 30
     fontcolor = (0, 255, 0)
     outputFile = 'C:/Users/DELL/Desktop/Slices'  # 识别结果存储地址
     if not os.path.exists(outputFile):
@@ -149,13 +147,13 @@ def detect(videoFile,outputFile):
 
 
 if __name__ == '__main__':
-    videoFile = 'MV2.mp4'                # 待识别视频
+    videoFile = 'MV3.mp4'                # 待识别视频
     outputFile = 'C:/Users/DELL/Desktop/Slices'     # 识别结果存储地址
-    width = 1200
-    height = 800
+    width = 1000
+    height = 600
 
-    windows_creater('frame',800,400)
-    windows_creater('result',800,400)
+    windows_creater('frame',width,height)
+    windows_creater('result',width,height)
 
     detect(videoFile,outputFile)
 
