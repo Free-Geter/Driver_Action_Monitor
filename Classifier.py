@@ -18,6 +18,19 @@ message_Queue = Queue()
 imdata_Queue = Queue()
 
 
+
+'''
+修改各种行为的判断阈值
+参数说明：
+info:待修改的信息字典
+kwargs:提交的阈值字典，字典形式：'行为类型':'阈值'
+'''
+def threshold_setter(info,**kwargs):
+    for key in kwargs.keys():
+        info[key]['threshold'] = kwargs[key]
+
+
+
 '''
 处理Person_info,返回结果字典、warning字符串
 '''
@@ -99,10 +112,9 @@ def windows_creater(name, width, height):
 '''
 处理并输出图像
 '''
-def detect(videoFile,outputFile):
-    color = (0, 255, 0)  # 标注框颜色
-    fontsize = 30
-    fontcolor = (0, 255, 0)
+def detect(videoFile,outputFile,fontsize=30,fontcolor=(0, 255, 0)):
+    fontsize = fontsize
+    fontcolor = fontcolor
     outputFile = 'C:/Users/DELL/Desktop/Slices'  # 识别结果存储地址
     if not os.path.exists(outputFile):
         os.makedirs(outputFile)
@@ -149,7 +161,7 @@ def detect(videoFile,outputFile):
 if __name__ == '__main__':
     videoFile = 'MV3.mp4'                # 待识别视频
     outputFile = 'C:/Users/DELL/Desktop/Slices'     # 识别结果存储地址
-    width = 1000
+    width = 800
     height = 600
 
     windows_creater('frame',width,height)

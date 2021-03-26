@@ -156,10 +156,13 @@ model.add(Conv2D(filters=256, kernel_size=2, padding='same', activation='relu', 
 model.add(MaxPooling2D(pool_size=2))
 model.add(Conv2D(filters=512, kernel_size=2, padding='same', activation='relu', kernel_initializer='glorot_normal'))
 model.add(MaxPooling2D(pool_size=2))
+# 神经元随机失活，防止神经网络的预测结果过于依赖某些神经元的运算结果
 model.add(Dropout(0.5))
 model.add(Flatten())
+# 使用线性函数拟合数据（图片的特征）的变化
 model.add(Dense(500, activation='relu', kernel_initializer='glorot_normal'))
 model.add(Dropout(0.5))
+# 分类，使用softmax，十个输出的值的和为1
 model.add(Dense(10, activation='softmax', kernel_initializer='glorot_normal'))
 
 model.summary()
@@ -175,7 +178,6 @@ shift_h = 0.2
 shear_range = 1.25   # 推移错切的强度
 rotation_range = 25     # 旋转角度
 datagen = ImageDataGenerator(width_shift_range=shift_w, height_shift_range=shift_h,
-
                              horizontal_flip=True,)
                              # fill_mode='constant'shear_range=shear_range,
 #                              rotation_range=rotation_range,)
